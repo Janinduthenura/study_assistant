@@ -112,3 +112,34 @@ study_assistant/
 - Run: git show --stat HEAD
 - Check if secret file is inside the commit
 - If not → just push directly: git push -u origin main
+
+---
+
+## Day 3 & 4 — New Concepts
+
+### try / except (Error Handling)
+try:
+    # code that might fail
+except Exception as e:
+    print(f"Error: {e}")  # handle it gracefully
+
+### datetime formatting
+from datetime import datetime
+timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M")
+
+### Writing to a file
+with open("filename.txt", "w", encoding="utf-8") as file:
+    file.write(content)
+
+### Reading files in a folder
+import os
+files = os.listdir("history")
+
+### Moving prompts to config.py
+- Keeps agents clean and focused
+- Easy to update prompts in one place
+- Import like: from config import RESEARCHER_PROMPT
+
+### Badges in README
+![Badge](https://img.shields.io/badge/Label-Message-color)
+Colors: blue, green, orange, red, yellow
