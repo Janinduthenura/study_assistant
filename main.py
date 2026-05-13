@@ -1,8 +1,9 @@
-# main.py — connects all 3 agents together
+# main.py
 
 from agents.researcher import research_topic
 from agents.teacher import teach_topic
 from agents.quiz_master import run_quiz
+from utils.file_manager import save_study_session, show_history
 
 def main():
     print("="*40)
@@ -12,13 +13,17 @@ def main():
     while True:
         print("\nWhat would you like to do?")
         print("1. Study a new topic")
-        print("2. Quit")
+        print("2. View study history")
+        print("3. Quit")
 
-        choice = input("\nYour choice (1 or 2): ")
+        choice = input("\nYour choice (1, 2 or 3): ")
 
-        if choice == "2":
+        if choice == "3":
             print("\nGoodbye! Keep learning! 👋")
             break
+
+        elif choice == "2":
+            show_history()
 
         elif choice == "1":
             topic = input("\nWhat topic do you want to study? ")
@@ -36,12 +41,20 @@ def main():
             input("\nPress Enter to start the quiz...")
 
             # ---- AGENT 3 — Quiz Master ----
-            run_quiz(lesson)
+            quiz_results = run_quiz(lesson)
 
-            print("\nWould you like to study another topic?")
+            # Calculate score from results
+            score = 0
+            if quiz_results:
+                for result in quiz_results:
+                    if "RESULT: CORRECT" in result["feedback"]:
+                        score += 1
+
+            # ---- SAVE SESSION ----
+            save_study_session(topic, research, lesson, quiz_results, score)
 
         else:
-            print("Invalid choice. Please type 1 or 2.")
+            print("Invalid choice. Please type 1, 2 or 3.")
 
 
 if __name__ == "__main__":
