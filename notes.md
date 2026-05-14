@@ -143,3 +143,43 @@ files = os.listdir("history")
 ### Badges in README
 ![Badge](https://img.shields.io/badge/Label-Message-color)
 Colors: blue, green, orange, red, yellow
+
+---
+
+## AWS Deployment Commands
+
+### Connect to EC2
+ssh -i "key.pem" ubuntu@YOUR_IP
+
+### Server Setup
+sudo apt update && sudo apt upgrade -y
+sudo apt install python3-pip python3-venv git -y
+git clone https://github.com/YOUR_USERNAME/repo.git
+cd repo
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+mkdir history
+
+### Gunicorn Service
+# Create service file
+sudo nano /etc/systemd/system/study-assistant.service
+
+# Start and enable service
+sudo systemctl daemon-reload
+sudo systemctl enable study-assistant
+sudo systemctl start study-assistant
+sudo systemctl status study-assistant
+
+### Useful server commands
+# Check if app is running
+sudo systemctl status study-assistant
+
+# Restart the app
+sudo systemctl restart study-assistant
+
+# Stop the app
+sudo systemctl stop study-assistant
+
+# View app logs
+sudo journalctl -u study-assistant -f
