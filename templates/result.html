@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study - {{ topic }}</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+    <!-- Navigation Bar -->
+    <nav>
+        <div class="nav-brand">🎓 AI Study Assistant</div>
+        <a href="/" class="nav-link">🏠 Home</a>
+    </nav>
+
+    <div class="container">
+
+        <h1>Studying: {{ topic }}</h1>
+
+        <!-- Research Section -->
+        <div class="card">
+            <h2>🔍 Research</h2>
+            <pre class="content-box">{{ research }}</pre>
+        </div>
+
+        <!-- Lesson Section -->
+        <div class="card">
+            <h2>📚 Lesson</h2>
+            <pre class="content-box">{{ lesson }}</pre>
+        </div>
+
+        <!-- Quiz Section — show if no results yet -->
+        {% if not results %}
+        <div class="card">
+            <h2>🎯 Quiz Time!</h2>
+            <p>Answer these questions based on what you just learned:</p>
+            <form action="/quiz" method="POST">
+                {% for question in questions %}
+                <div class="question-box">
+                    <p class="question">{{ question }}</p>
+                    <input
+                        type="text"
+                        name="answer_{{ loop.index0 }}"
+                        placeholder="Your answer..."
+                        class="answer-input"
+                        required
+                    />
+                </div>
+                {% endfor %}
+                <button type="submit" class="btn-primary">
+                    ✅ Submit Answers
+                </button>
+            </form>
+        </div>
+        {% endif %}
+
+        <!-- Results Section — show after quiz submitted -->
+        {% if results %}
+        <div class="card">
+            <h2>📊 Quiz Results</h2>
+
+            {% for result in results %}
+            <div class="result-box {% if 'RESULT: CORRECT' in result.feedback %}correct{% else %}incorrect{% endif %}">
+                <p class="question">{{ result.question }}</p>
+                <p><strong>Your answer:</strong> {{ result.answer }}</p>
+                <p>{{ result.feedback }}</p>
+            </div>
+            {% endfor %}
+
+            <!-- Final Score -->
+            <div class="score-box">
+                <h2>Final Score: {{ score }}/{{ total }}</h2>
+                {% if score == total %}
+                    <p>🎉 Perfect score! You're a master!</p>
+                {% elif score >= total - 1 %}
+                    <p>👍 Great job! Almost perfect!</p>
+                {% elif score >= 1 %}
+                    <p>📚 Good try! Review the lesson and try again!</p>
+                {% else %}
+                    <p>💪 Keep studying! You'll get it next time!</p>
+                {% endif %}
+            </div>
+
+            <a href="/" class="btn-primary">📖 Study Another Topic</a>
+        </div>
+        {% endif %}
+
+    </

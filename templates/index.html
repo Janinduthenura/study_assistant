@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Study Assistant</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+    <!-- Navigation Bar -->
+    <nav>
+        <div class="nav-brand">🎓 AI Study Assistant</div>
+        <a href="/history" class="nav-link">📂 Study History</a>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container">
+
+        <!-- Hero Section -->
+        <div class="hero">
+            <h1>Learn Anything with AI</h1>
+            <p>Enter any topic and our 3 AI agents will research it,
+               teach it to you, and quiz you on it!</p>
+        </div>
+
+        <!-- Error Message (shows only if there's an error) -->
+        {% if error %}
+        <div class="error-box">
+            ❌ {{ error }}
+        </div>
+        {% endif %}
+
+        <!-- Study Form -->
+        <div class="card">
+            <h2>What do you want to study today?</h2>
+            <form action="/study" method="POST">
+                <input
+                    type="text"
+                    name="topic"
+                    placeholder="e.g. black holes, photosynthesis, world war 2..."
+                    class="topic-input"
+                    required
+                />
+                <button type="submit" class="btn-primary">
+                    🚀 Start Studying
+                </button>
+            </form>
+        </div>
+
+        <!-- How It Works Section -->
+        <div class="how-it-works">
+            <h2>How It Works</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-icon">🔍</div>
+                    <h3>Research</h3>
+                    <p>Agent 1 gathers structured information about your topic</p>
+                </div>
+                <div class="step">
+                    <div class="step-icon">📚</div>
+                    <h3>Lesson</h3>
+                    <p>Agent 2 turns the research into a clear beginner friendly lesson</p>
+                </div>
+                <div class="step">
+                    <div class="step-icon">🎯</div>
+                    <h3>Quiz</h3>
+                    <p>Agent 3 tests your knowledge and grades your answers instantly</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Study History (shows only if history exists) -->
+        {% if history %}
+        <div class="card">
+            <h2>📂 Your Study History</h2>
+            <ul class="history-list">
+                {% for file in history %}
+                <li>📄 {{ file }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %} 
+        </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>Built with Python, Flask & Groq API 🤖</p>
+    </footer>
+
+</body>
+</html>
