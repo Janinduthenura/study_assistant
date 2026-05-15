@@ -183,3 +183,19 @@ sudo systemctl stop study-assistant
 
 # View app logs
 sudo journalctl -u study-assistant -f
+
+## AWS Important Notes
+
+### IP Address Issue
+- EC2 free instances change IP every time you stop/start
+- Fix: Use Elastic IP (static IP that never changes)
+- EC2 → Elastic IPs → Allocate → Associate to instance
+
+### Check if app is running
+sudo systemctl status study-assistant
+
+### View live logs
+sudo journalctl -u study-assistant -f
+
+### Restart app after code changes
+sudo systemctl restart study-assistant
