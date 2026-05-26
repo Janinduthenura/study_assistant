@@ -1,0 +1,15 @@
+
+    Photosynthesis is the process by which plants use sunlight,
+    water and carbon dioxide to produce oxygen and energy in the
+    form of sugar.
+
+    The process happens in the chloroplasts of plant cells.
+    Chlorophyll is the green pigment that captures light energy.
+
+    There are two main stages of photosynthesis:
+    1. Light dependent reactions
+    2. Light independent reactions (Calvin cycle)
+
+    The overall equation is:
+    6CO2 + 6H2O + light energy → C6H12O6 + 6O2
+    

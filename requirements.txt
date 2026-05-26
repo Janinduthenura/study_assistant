@@ -1,3 +1,6 @@
 groq
 flask
 gunicorn
+PyPDF2
+sentence-transformers
+faiss-cpu
