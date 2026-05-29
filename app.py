@@ -1,4 +1,4 @@
-# app.py — Flask web application
+# app.py
 
 from flask import Flask, render_template, request, session
 import os
@@ -6,50 +6,106 @@ import sys
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from agents.researcher import research_topic
+from agents.researcher import research_topic, research_from_document
 from agents.teacher import teach_topic
 from agents.quiz_master import extract_questions, grade_answer
-from utils.file_manager import save_study_session, show_history, load_study_history
+from utils.file_manager import save_study_session, load_study_history
+from rag.embeddings import process_document, load_index
 
-# Create the Flask app
 app = Flask(__name__)
-
-# Secret key for session (stores data between pages)
 app.secret_key = "study_assistant_secret_key"
+
+# Make sure upload folder exists
+os.makedirs("uploads", exist_ok=True)
 
 
 # ---- ROUTES ----
 
-# Route 1 — Home page
 @app.route("/")
 def home():
     return render_template("index.html")
 
 
-# Route 2 — Study a topic
 @app.route("/study", methods=["POST"])
 def study():
-    # Get the topic from the form
-    topic = request.form.get("topic", "").strip()
+    # Which mode did the user choose?
+    mode = request.form.get("mode")
 
-    if topic == "":
-        return render_template("index.html", error="Please enter a topic!")
+    # ---- MODE 1 — Learn from AI ----
+    if mode == "ai":
+        topic = request.form.get("topic", "").strip()
 
+        if topic == "":
+            return render_template("index.html",
+                error="Please enter a topic!")
+
+        try:
+            research = research_topic(topic)
+            session["topic"] = topic
+            session["research"] = research
+            session["mode"] = "ai"
+
+        except Exception as e:
+            return render_template("index.html",
+                error=f"Researcher Agent failed: {e}")
+
+    # ---- MODE 2 — Learn from document ----
+    elif mode == "document":
+        # Check if file was uploaded
+        if "document" not in request.files:
+            return render_template("index.html",
+                error="Please upload a file!")
+
+        file = request.files["document"]
+
+        if file.filename == "":
+            return render_template("index.html",
+                error="Please select a file!")
+
+        # Check file type
+        allowed = [".pdf", ".txt", ".md"]
+        ext = os.path.splitext(file.filename)[1].lower()
+
+        if ext not in allowed:
+            return render_template("index.html",
+                error="Only PDF, TXT and MD files are supported!")
+
+        # Get the topic
+        topic = request.form.get("doc_topic", "").strip()
+        if topic == "":
+            return render_template("index.html",
+                error="Please enter what to study from the document!")
+
+        try:
+            # Save the uploaded file
+            file_path = os.path.join("uploads", file.filename)
+            file.save(file_path)
+
+            # Process the document through RAG pipeline
+            index, chunks = process_document(file_path)
+
+            # Research from document
+            research = research_from_document(topic, index, chunks)
+
+            session["topic"] = topic
+            session["research"] = research
+            session["mode"] = "document"
+            session["filename"] = file.filename
+
+        except Exception as e:
+            return render_template("index.html",
+                error=f"Document processing failed: {e}")
+
+    # ---- BOTH MODES continue the same way ----
     try:
-        # Run all 3 agents
-        research = research_topic(topic)
         lesson = teach_topic(research)
         questions_text = extract_questions(lesson)
 
-        # Extract questions into a list
         questions = []
         for line in questions_text.strip().split("\n"):
             if line.startswith("Q1:") or line.startswith("Q2:") or line.startswith("Q3:"):
                 questions.append(line.strip())
 
-        # Save everything in session so we can use it later
-        session["topic"] = topic
-        session["research"] = research
         session["lesson"] = lesson
         session["questions"] = questions
 
@@ -58,26 +114,26 @@ def study():
             topic=topic,
             research=research,
             lesson=lesson,
-            questions=questions
+            questions=questions,
+            mode=mode
         )
 
     except Exception as e:
-        return render_template("index.html", error=f"Something went wrong: {e}")
+        return render_template("index.html",
+            error=f"Something went wrong: {e}")
 
 
-# Route 3 — Submit quiz answers
 @app.route("/quiz", methods=["POST"])
 def quiz():
-    # Get questions from session
     questions = session.get("questions", [])
     topic = session.get("topic", "")
     research = session.get("research", "")
     lesson = session.get("lesson", "")
+    mode = session.get("mode", "ai")
 
     score = 0
     results = []
 
-    # Grade each answer
     for i, question in enumerate(questions):
         answer = request.form.get(f"answer_{i}", "").strip()
         feedback = grade_answer(question, answer)
@@ -91,7 +147,6 @@ def quiz():
             "feedback": feedback
         })
 
-    # Save the session
     try:
         save_study_session(topic, research, lesson, results, score)
     except Exception as e:
@@ -105,17 +160,16 @@ def quiz():
         questions=questions,
         results=results,
         score=score,
-        total=len(questions)
+        total=len(questions),
+        mode=mode
     )
 
 
-# Route 4 — Study history
 @app.route("/history")
 def history():
     files = load_study_history()
     return render_template("index.html", history=files)
 
 
-# Run the app
 if __name__ == "__main__":
     app.run(debug=True)

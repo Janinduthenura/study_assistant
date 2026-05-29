@@ -8,69 +8,105 @@
 </head>
 <body>
 
-    <!-- Navigation Bar -->
     <nav>
         <div class="nav-brand">🎓 AI Study Assistant</div>
         <a href="/history" class="nav-link">📂 Study History</a>
     </nav>
 
-    <!-- Main Container -->
     <div class="container">
 
-        <!-- Hero Section -->
         <div class="hero">
             <h1>Learn Anything with AI</h1>
-            <p>Enter any topic and our 3 AI agents will research it,
-               teach it to you, and quiz you on it!</p>
+            <p>Study from AI knowledge or upload your own documents!</p>
         </div>
 
-        <!-- Error Message (shows only if there's an error) -->
         {% if error %}
-        <div class="error-box">
-            ❌ {{ error }}
-        </div>
+        <div class="error-box">❌ {{ error }}</div>
         {% endif %}
 
-        <!-- Study Form -->
-        <div class="card">
-            <h2>What do you want to study today?</h2>
-            <form action="/study" method="POST">
-                <input
-                    type="text"
-                    name="topic"
-                    placeholder="e.g. black holes, photosynthesis, world war 2..."
-                    class="topic-input"
-                    required
-                />
-                <button type="submit" class="btn-primary">
-                    🚀 Start Studying
-                </button>
-            </form>
+        <!-- TWO MODE CARDS SIDE BY SIDE -->
+        <div class="mode-container">
+
+            <!-- MODE 1 — AI Research -->
+            <div class="mode-card">
+                <div class="mode-icon">🤖</div>
+                <h2>Learn from AI</h2>
+                <p class="mode-desc">Type any topic and our AI agents
+                will research, teach and quiz you!</p>
+                <form action="/study" method="POST">
+                    <input type="hidden" name="mode" value="ai">
+                    <input
+                        type="text"
+                        name="topic"
+                        placeholder="e.g. black holes, photosynthesis..."
+                        class="topic-input"
+                        required
+                    />
+                    <button type="submit" class="btn-primary">
+                        🚀 Start Studying
+                    </button>
+                </form>
+            </div>
+
+            <!-- DIVIDER -->
+            <div class="mode-divider">
+                <span>OR</span>
+            </div>
+
+            <!-- MODE 2 — Document Upload -->
+            <div class="mode-card">
+                <div class="mode-icon">📄</div>
+                <h2>Learn from Document</h2>
+                <p class="mode-desc">Upload your own PDF or notes and
+                study directly from your material!</p>
+                <form action="/study" method="POST"
+                    enctype="multipart/form-data">
+                    <input type="hidden" name="mode" value="document">
+                    <input
+                        type="text"
+                        name="doc_topic"
+                        placeholder="What to study from the document?"
+                        class="topic-input"
+                        required
+                    />
+                    <input
+                        type="file"
+                        name="document"
+                        accept=".pdf,.txt,.md"
+                        class="file-input"
+                        required
+                    />
+                    <button type="submit" class="btn-primary">
+                        📤 Upload & Study
+                    </button>
+                </form>
+            </div>
+
         </div>
 
-        <!-- How It Works Section -->
+        <!-- HOW IT WORKS -->
         <div class="how-it-works">
             <h2>How It Works</h2>
             <div class="steps">
                 <div class="step">
                     <div class="step-icon">🔍</div>
                     <h3>Research</h3>
-                    <p>Agent 1 gathers structured information about your topic</p>
+                    <p>Agent 1 gathers information from AI or your document</p>
                 </div>
                 <div class="step">
                     <div class="step-icon">📚</div>
                     <h3>Lesson</h3>
-                    <p>Agent 2 turns the research into a clear beginner friendly lesson</p>
+                    <p>Agent 2 turns it into a clear beginner friendly lesson</p>
                 </div>
                 <div class="step">
                     <div class="step-icon">🎯</div>
                     <h3>Quiz</h3>
-                    <p>Agent 3 tests your knowledge and grades your answers instantly</p>
+                    <p>Agent 3 tests your knowledge and grades your answers</p>
                 </div>
             </div>
         </div>
 
-        <!-- Study History (shows only if history exists) -->
+        <!-- HISTORY -->
         {% if history %}
         <div class="card">
             <h2>📂 Your Study History</h2>
@@ -80,10 +116,10 @@
                 {% endfor %}
             </ul>
         </div>
-        {% endif %} 
-        </div>
+        {% endif %}
 
-    <!-- Footer -->
+    </div>
+
     <footer>
         <p>Built with Python, Flask & Groq API 🤖</p>
     </footer>
